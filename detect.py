@@ -30,14 +30,6 @@ photo_count = 0
 with picamera.PiCamera() as camera:
     with picamera.array.PiRGBArray(camera) as output:
         
-
-
-        while True: #Continuous capture loop
-    # Capture an image 
-# Initialize Pi Camera
-with picamera.PiCamera() as camera:
-    with picamera.array.PiRGBArray(camera) as output:
-        
         while True:  # Continuous capture loop
             # Capture an image using Pi Camera
             camera.capture(output, 'rgb')
