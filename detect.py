@@ -1,5 +1,5 @@
 # Import necessary modules
-import cv2
+import libcamera as lc
 import numpy as np
 from ultralytics import YOLO
 import RPi.GPIO as GPIO
@@ -18,49 +18,53 @@ GPIO.setup(pin_water_gun, GPIO.OUT)
 GPIO.setup(pin_turn_right, GPIO.OUT)
 GPIO.setup(pin_turn_left, GPIO.OUT)
 
-# Read the image (replace this part with your image capture logic)
-image = cv2.imread('your_image.jpg')
-frame_center = (image.shape[1] // 2, image.shape[0] // 2)
+# Initialize the camera
+camera = lc.CameraManager()
 
-# Perform inference on the uploaded photo
-results = model('your_image.jpg')
 
 # Flag for squirrel detection
 squirrel_detected = False
 photo_count = 0
 
-# Process the results
-for result in results:
-    boxes = result.boxes.xyxy.cpu().numpy()
-    
+while True: #Continuous capture loop
+    # Capture an image 
+
+    frame = camera.capture()
+    frame = cv2.cvtColor(np.array(frame), cv2.COLOR_BGR2RGB)
+    frame_center = (frame.shape[1] // 2, frame.shape[0] // 2)
+
+    # Run inference
+    results = model(frame)
+    for result in results: 
+        boxes = result.boxes.xyxy.cpu().numpy()
     # Check if any boxes are detected
-    if len(boxes) > 0:
-        squirrel_detected = True
-        photo_count += 1 #Increment the photo count
+        if len(boxes) > 0:
+            squirrel_detected = True
+            photo_count += 1 #Increment the photo count
         
-        # Start squirting
-        GPIO.output(pin_water_gun, GPIO.HIGH)
-        sleep(2) #Squirt for two seconds
-        GPIO.output(pin_water_gun, GPIO.LOW)  # Stop squirting
+            # Start squirting
+            GPIO.output(pin_water_gun, GPIO.HIGH)
+            sleep(2) #Squirt for two seconds
+            GPIO.output(pin_water_gun, GPIO.LOW)  # Stop squirting
 
         
-        for box in boxes:
-            x1, y1, x2, y2 = map(int, box)
-            box_center = ((x1 + x2) // 2, (y1 + y2) // 2)
+            for box in boxes:
+                x1, y1, x2, y2 = map(int, box)
+                box_center = ((x1 + x2) // 2, (y1 + y2) // 2)
             
-            # Draw bounding box
-            cv2.rectangle(image, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                # Draw bounding box
+                cv2.rectangle(image, (x1, y1), (x2, y2), (0, 255, 0), 2)
             
             # Turn the water gun to center the squirrel
-            if box_center[0] < frame_center[0]:
-                GPIO.output(pin_turn_left, GPIO.HIGH)
-                GPIO.output(pin_turn_right, GPIO.LOW)
-            else:
-                GPIO.output(pin_turn_right, GPIO.HIGH)
-                GPIO.output(pin_turn_left, GPIO.LOW)
+                if box_center[0] < frame_center[0]:
+                    GPIO.output(pin_turn_left, GPIO.HIGH)
+                    GPIO.output(pin_turn_right, GPIO.LOW)
+                else:
+                    GPIO.output(pin_turn_right, GPIO.HIGH)
+                    GPIO.output(pin_turn_left, GPIO.LOW)
                 
         # Save the image with bounding box
-        cv2.imwrite(f'squirrel_detected_{photo_count}.jpg', image)
+        cv2.imwrite(f'squirrel_detected_{photo_count}.jpg', frame)
         
 
         # Stop turning (you may want to adjust the timing)
