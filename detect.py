@@ -1,12 +1,16 @@
 # Import necessary modules
 import libcamera as lc
 import numpy as np
+import cv2  # Import OpenCV
 import sys
+from time import sleep
 sys.path.append('/home/pi4/project1/.venv/lib/python3.11/site-packages')
-
 from ultralytics import YOLO
 import RPi.GPIO as GPIO
-from time import sleep
+
+# Initialize the camera
+camera = lc.CameraManager()  # Initialize the libcamera CameraManager
+camera = camera.start_camera()  # Start the camera
 
 # Initialize the YOLOv8 model
 model = YOLO('squirrel.pt')
@@ -24,9 +28,10 @@ GPIO.setup(pin_turn_left, GPIO.OUT)
 # Flag for squirrel detection
 squirrel_detected = False
 photo_count = 0
+
 while True:  # Continuous capture loop
     # Capture an image using libcamera
-    frame = camera.capture()
+    frame = camera.capture()  # Assuming capture() returns a frame
     frame = cv2.cvtColor(np.array(frame), cv2.COLOR_BGR2RGB)
     frame_center = (frame.shape[1] // 2, frame.shape[0] // 2)
 
