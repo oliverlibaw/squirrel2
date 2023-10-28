@@ -1,4 +1,4 @@
-from picamera2 import PiCamera
+from picamera2 import Picamera2
 import cv2
 import numpy as np
 import RPi.GPIO as GPIO
@@ -19,7 +19,7 @@ GPIO.setup(pin_turn_right, GPIO.OUT)
 GPIO.setup(pin_turn_left, GPIO.OUT)
 
 # Initialize Pi Camera
-camera = PiCamera()
+camera = Picamera2()
 
 # Flag for squirrel detection
 squirrel_detected = False
