@@ -24,6 +24,7 @@ GPIO.setwarnings(False)  # Suppress GPIO warnings
 pin_water_gun = 17
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(pin_water_gun, GPIO.OUT)
+print(f'GPIO setup done')
 
 # Initialize Pi Camera
 picam2 = Picamera2()
@@ -32,6 +33,7 @@ config.main.size = (640, 640)
 config.main.format = "RGB888"
 picam2.configure(config)
 picam2.start()
+print(f'Camera initialized.')
 
 squirrel_detected = False
 photo_count = 0
@@ -40,18 +42,22 @@ while True:
     # Capture frame
     buffer = picam2.capture_buffer("main")
     frame = np.array(buffer, copy=False, dtype=np.uint8).reshape((640, 640, 3))
+    print(f'Capture frame.')
 
     # Convert to PIL for preprocessing
     pil_frame = Image.fromarray(frame)
+    print(f'Convert to PIL.')
     
 
     # Preprocess
     input_tensor = preprocess(pil_frame)
     input_batch = input_tensor.unsqueeze(0)
+    print(f'Preprocess.')
 
     # Perform inference
     results = model(input_batch)
     boxes = results.xyxy[0].cpu().numpy()
+    print(f'Running inference.')
 
     if len(boxes) > 0:
         squirrel_detected = True
