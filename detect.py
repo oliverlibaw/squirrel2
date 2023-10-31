@@ -55,6 +55,16 @@ while True:
     print(f'Preprocess.')
 
     # Perform inference
+    try:
+    # Perform inference
+        print("Running inference...")
+        results = model(input_batch)
+        print("Inference complete.")
+    except Exception as e:
+    print(f"An error occurred during inference: {e}")
+
+
+    
     results = model(input_batch)
     boxes = results.xyxy[0].cpu().numpy()
     print(f'Running inference.')
