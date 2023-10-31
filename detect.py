@@ -25,7 +25,9 @@ GPIO.setup(pin_water_gun, GPIO.OUT)
 
 # Initialize Pi Camera
 picam2 = Picamera2()
-config = picam2.preview_configuration(main={"size": (640, 640), "format": "RGB888"})
+config = picam2.preview_configuration
+config.main.size = (640, 640)
+config.main.format = "RGB888"
 picam2.configure(config)
 picam2.start()
 
