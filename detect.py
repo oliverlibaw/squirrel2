@@ -61,7 +61,7 @@ while True:
         results = model(input_batch)
         print("Inference complete.")
     except Exception as e:
-    print(f"An error occurred during inference: {e}")
+        print(f"An error occurred during inference: {e}")
 
 
     
