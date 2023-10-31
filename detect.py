@@ -6,6 +6,7 @@ import RPi.GPIO as GPIO
 from time import sleep
 from torchvision import transforms
 from ultralytics import YOLO
+from PIL import Image 
 
 # Initialize YOLO model
 model = YOLO('squirrel.pt')
@@ -19,6 +20,7 @@ preprocess = transforms.Compose([
 ])
 
 # Initialize GPIO
+GPIO.setwarnings(False)  # Suppress GPIO warnings
 pin_water_gun = 17
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(pin_water_gun, GPIO.OUT)
@@ -41,6 +43,7 @@ while True:
 
     # Convert to PIL for preprocessing
     pil_frame = Image.fromarray(frame)
+    
 
     # Preprocess
     input_tensor = preprocess(pil_frame)
